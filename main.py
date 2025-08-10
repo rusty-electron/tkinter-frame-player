@@ -158,6 +158,19 @@ class VideoApp:
             else:
                 self.show_keymaps()
 
+    def get_keymap_text(self):
+        """Return the standardized keymap text used in multiple places"""
+        return """
+← (Left Arrow): Previous frame
+→ (Right Arrow): Next frame
+Shift + ← : Skip back 10 frames
+Shift + → : Skip forward 10 frames
+Space: Play/Pause
+s: Save current frame
+o: Open video file
+q: Quit application
+        """
+
     def show_keymaps(self):
         """Display keyboard shortcuts on the canvas when no video is loaded"""
         self.canvas.delete("all")
@@ -181,21 +194,10 @@ class VideoApp:
         )
         
         # Then create the shortcuts list with regular font
-        shortcuts_text = """
-        ← (Left Arrow): Previous frame
-        → (Right Arrow): Next frame
-        Shift + ← : Skip back 10 frames
-        Shift + → : Skip forward 10 frames
-        Space: Play/Pause
-        s: Save current frame
-        o: Open video file
-        q: Quit application
-        """
-        
         self.canvas.create_text(
             canvas_width // 2, 
             (canvas_height // 2) + 20,
-            text=shortcuts_text,
+            text=self.get_keymap_text(),
             font=("Arial", 14),
             justify=tk.LEFT
         )
@@ -300,45 +302,42 @@ class VideoApp:
         else:
             self.show_message("Already at last frame")
             
-    def skip_back(self, event=None):
-        """Skip back 10 frames"""
+    def skip_frames(self, count):
+        """Skip forward or backward by specified number of frames
+        Positive count = forward, negative count = backward
+        """
         if self.is_playing:
             self.toggle_play()  # Stop playback when manually navigating
             
         if not self.video_capture:
             return
             
-        # Calculate new position (ensure we don't go below 0)
-        new_position = max(0, self.frame_index - 10)
+        # Calculate new position with bounds checking
+        if count > 0:
+            new_position = min(self.total_frames - 1, self.frame_index + count)
+            message = f"Skipped forward {count} frames"
+            error_message = "Already at last frame"
+        else:
+            new_position = max(0, self.frame_index + count)  # count is negative
+            message = f"Skipped back {abs(count)} frames"
+            error_message = "Already at first frame"
         
-        # If we're already at the start, show a message
+        # If position didn't change, we're at a boundary
         if new_position == self.frame_index:
-            self.show_message("Already at first frame")
+            self.show_message(error_message)
             return
             
         self.frame_index = new_position
         self.show_frame()
-        self.show_message(f"Skipped back 10 frames")
+        self.show_message(message)
+
+    def skip_back(self, event=None):
+        """Skip back 10 frames"""
+        self.skip_frames(-10)
         
     def skip_forward(self, event=None):
         """Skip forward 10 frames"""
-        if self.is_playing:
-            self.toggle_play()  # Stop playback when manually navigating
-            
-        if not self.video_capture:
-            return
-            
-        # Calculate new position (ensure we don't exceed total frames)
-        new_position = min(self.total_frames - 1, self.frame_index + 10)
-        
-        # If we're already at the end, show a message
-        if new_position == self.frame_index:
-            self.show_message("Already at last frame")
-            return
-            
-        self.frame_index = new_position
-        self.show_frame()
-        self.show_message(f"Skipped forward 10 frames")
+        self.skip_frames(10)
 
     def toggle_play(self, event=None):
         """Toggle between play and pause states"""
@@ -408,22 +407,10 @@ class VideoApp:
         )
         title_label.pack(pady=(0, 10))
         
-        # Keymap text
-        keymap_text = """
-← (Left Arrow): Previous frame
-→ (Right Arrow): Next frame
-Shift + ← : Skip back 10 frames
-Shift + → : Skip forward 10 frames
-Space: Play/Pause
-s: Save current frame
-o: Open video file
-q: Quit application
-        """
-        
         # Add keymap text
         label = tk.Label(
             frame,
-            text=keymap_text,
+            text=self.get_keymap_text(),
             font=("Arial", 12),
             justify=tk.LEFT
         )
