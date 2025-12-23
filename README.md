@@ -8,13 +8,20 @@ I vibe-coded a python script that plays a video frame by frame.
 - Save current frame as image
 - Play/Pause functionality
 
-Simple Tkinter frame video player.
+## Instructions
 
-Install locally:
-    cd d:\workspace\tkinter-frame-player
-    python -m pip install -e .
+* Install locally:
 
-Run:
-    frame-player
-Or:
-    python -m tkinter_frame_player
+```bash
+git clone <repository-url>
+cd tkinter-frame-player
+python -m pip install -e .
+```
+
+* Run:
+
+```bash
+frame-player
+# Or:
+python -m tkinter_frame_player
+```
