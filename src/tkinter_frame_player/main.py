@@ -435,7 +435,10 @@ q: Quit application
         # Wait for this window to be closed before returning to the main window
         self.root.wait_window(keymap_window)
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
     app = VideoApp(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()
