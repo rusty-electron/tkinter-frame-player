@@ -13,7 +13,7 @@ I vibe-coded a python script that plays a video frame by frame.
 * Install locally:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/rusty-electron/tkinter-frame-player.git
 cd tkinter-frame-player
 python -m pip install -e .
 ```
